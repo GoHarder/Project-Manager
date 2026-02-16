@@ -87,6 +87,11 @@
     window.api.projects.put(snap);
   }
 
+  function onCopy() {
+    ProjectSt.data = project;
+    setPage('new-project');
+  }
+
   function onEdit() {
     ProjectSt.data = project;
     setPage('edit-project');
@@ -126,7 +131,7 @@
         <div data-slot="headline">Properties</div>
         <Icon data-slot="end">edit</Icon>
       </MenuItem>
-      <MenuItem disabled>
+      <MenuItem onclick={onCopy}>
         <div data-slot="headline">Copy</div>
         <Icon data-slot="end">folder_copy</Icon>
       </MenuItem>

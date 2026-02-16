@@ -1,12 +1,12 @@
 // MARK: Imports
 // -----------------------------------------------------------------------------
-import { join } from 'node:path';
+import { join, extname } from 'node:path';
 // - NPM
 import { ipcMain, net } from 'electron';
 // - Local
 import { handleError } from '../lib/error';
 import {
-  // copyDir,
+  copyDir,
   deleteDir,
   findProjectPath,
   getProjectDir,
@@ -100,6 +100,15 @@ async function postProject(event: IpcMainEvent, project: App.ProjectDoc) {
     released: null,
   };
 
+  const check = await findProjectPath(dirName);
+  if (check.success) {
+    event.reply('send:error', {
+      name: 'Already exists',
+      message: `Project ${dirName} already exists`,
+    });
+    return;
+  }
+
   const makeRes = await makeDir(join(baseDir, dirName));
   if (!makeRes.success) {
     event.reply('send:error', makeRes.error);
@@ -124,7 +133,41 @@ async function postProject(event: IpcMainEvent, project: App.ProjectDoc) {
   event.reply('send:projects', fetchRes.data);
 }
 
-// async function postProjectCopy(event: IpcMainEvent, project: App.ProjectDoc) {}
+async function postProjectCopy(
+  event: IpcMainEvent,
+  contractNo: string,
+  project: App.ProjectDoc,
+) {
+  await postProject(event, project);
+
+  const srcPathRes = await findProjectPath(contractNo);
+  const destPath = join(
+    getProjectDir(project.contractNo),
+    `${project.contractNo} ${project.customerName}`,
+  );
+
+  if (!srcPathRes.success) {
+    event.reply('send:error', srcPathRes.error);
+    return;
+  }
+
+  const filter = (src: string, _dest: string) => {
+    const ext = extname(src);
+    const validExts = ['.pdf'];
+    if (!ext) return true;
+    return validExts.includes(ext);
+  };
+
+  const copyRes = await copyDir(srcPathRes.data, destPath, {
+    recursive: true,
+    filter,
+  });
+
+  if (!copyRes.success) {
+    event.reply('send:error', copyRes.error);
+    return;
+  }
+}
 
 /**
  * Handles the `get:projects` IPC event
@@ -266,6 +309,7 @@ async function deleteProject(event: IpcMainEvent, contractNo: string) {
 // -----------------------------------------------------------------------------
 export default function () {
   ipcMain.on('post:projects', postProject);
+  ipcMain.on('post:projects-copy', postProjectCopy);
   ipcMain.on('get:projects', getProjects);
   ipcMain.handle('get:projects-report', getReport);
   ipcMain.on('put:projects', putProject);

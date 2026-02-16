@@ -19,6 +19,8 @@ const api = {
   },
   projects: {
     post: (project) => ipcRenderer.send('post:projects', project),
+    postCopy: (contractNo, project) =>
+      ipcRenderer.send('post:projects-copy', contractNo, project),
     get: () => ipcRenderer.send('get:projects'),
     getReport: () => ipcRenderer.invoke('get:projects-report'),
     put: (project) => ipcRenderer.send('put:projects', project),

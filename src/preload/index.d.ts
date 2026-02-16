@@ -25,6 +25,7 @@ declare global {
       };
       projects: {
         post: (project: NewProjectDoc) => void;
+        postCopy: (contractNo: string, project: NewProjectDoc) => void;
         get: () => void;
         getReport: () => Promise<
           Oneof<[{ success: true; data: App.ProjectReport }, App.MainError]>

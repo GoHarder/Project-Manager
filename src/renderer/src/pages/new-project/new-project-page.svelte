@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount, onDestroy } from 'svelte';
   import z from 'zod';
 
   // MARK: Types
@@ -16,7 +17,7 @@
   import { Option, Select } from '@moss/comp/select';
   import { NumberField, TextField } from '@moss/comp/text-field';
 
-  import { Page } from '../../components/index';
+  import { Page, ProjectSt } from '../../components/index';
 
   // MARK: Stores
   // -----------------------------------------------------------------------------
@@ -36,6 +37,28 @@
 
   // MARK: Helpers
   // -----------------------------------------------------------------------------
+  function submitNew() {
+    window.api.projects.post({
+      customerName,
+      contractNo,
+      poNo,
+      price,
+      currency,
+    });
+  }
+
+  function submitCopy() {
+    const srcNo = ProjectSt.data.contractNo || '';
+
+    window.api.projects.postCopy(srcNo, {
+      customerName,
+      contractNo,
+      poNo,
+      price,
+      currency,
+    });
+  }
+
   // MARK: State
   // -----------------------------------------------------------------------------
   let formEle = $state<HTMLFormElement>();
@@ -49,6 +72,12 @@
 
   // MARK: Derived
   // -----------------------------------------------------------------------------
+  let title = $derived(
+    ProjectSt.data
+      ? `Copy project ${ProjectSt.data.contractNo}`
+      : 'New project',
+  );
+
   // MARK: Effects
   // -----------------------------------------------------------------------------
   $effect(() => {
@@ -64,30 +93,38 @@
   // -----------------------------------------------------------------------------
   function onsubmit(event: SubmitEvent) {
     event.preventDefault();
-    window.api.projects.post({
-      customerName,
-      contractNo,
-      poNo,
-      price,
-      currency,
-    });
+
+    if (ProjectSt.data) {
+      submitCopy();
+    } else {
+      submitNew();
+    }
+
     formEle.reset();
     setPage('projects');
   }
 
   // MARK: Lifecycle
   // -----------------------------------------------------------------------------
+  onMount(() => {
+    if (!ProjectSt.data) return;
+    customerName = ProjectSt.data.customerName;
+  });
+
+  onDestroy(() => {
+    ProjectSt.data = undefined;
+  });
 </script>
 
 <svelte:head>
-  <title>Project Manager - New project</title>
+  <title>Project Manager - {title}</title>
 </svelte:head>
 
 {#snippet slot_headline()}
   <IconButton id="main-menu" tooltip="Back" onclick={() => setPage('projects')}>
     <Icon>arrow_back</Icon>
   </IconButton>
-  <h1>New project</h1>
+  <h1>{title}</h1>
 {/snippet}
 
 <Page {slot_headline}>
