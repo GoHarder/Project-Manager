@@ -89,7 +89,7 @@
 
   function onCopy() {
     ProjectSt.data = project;
-    setPage('new-project');
+    setPage('copy-project');
   }
 
   function onEdit() {

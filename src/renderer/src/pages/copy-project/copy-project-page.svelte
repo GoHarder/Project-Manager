@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount, onDestroy } from 'svelte';
   import z from 'zod';
 
   // MARK: Types
@@ -16,7 +17,7 @@
   import { Option, Select } from '@moss/comp/select';
   import { NumberField, TextField } from '@moss/comp/text-field';
 
-  import { Page } from '../../components/index';
+  import { Page, ProjectSt } from '../../components/index';
 
   // MARK: Stores
   // -----------------------------------------------------------------------------
@@ -65,7 +66,9 @@
   function onsubmit(event: SubmitEvent) {
     event.preventDefault();
 
-    window.api.projects.post({
+    const srcNo = ProjectSt.data.contractNo || '';
+
+    window.api.projects.postCopy(srcNo, {
       customerName,
       contractNo,
       poNo,
@@ -79,17 +82,25 @@
 
   // MARK: Lifecycle
   // -----------------------------------------------------------------------------
+  onMount(() => {
+    if (!ProjectSt.data) return;
+    customerName = ProjectSt.data.customerName;
+  });
+
+  onDestroy(() => {
+    ProjectSt.data = undefined;
+  });
 </script>
 
 <svelte:head>
-  <title>Project Manager - New project</title>
+  <title>Project Manager - Copy project {ProjectSt.data.contractNo}</title>
 </svelte:head>
 
 {#snippet slot_headline()}
   <IconButton id="main-menu" tooltip="Back" onclick={() => setPage('projects')}>
     <Icon>arrow_back</Icon>
   </IconButton>
-  <h1>New project</h1>
+  <h1>Copy project {ProjectSt.data.contractNo}</h1>
 {/snippet}
 
 <Page {slot_headline}>

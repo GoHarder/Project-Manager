@@ -5,6 +5,7 @@
   // -----------------------------------------------------------------------------
   // MARK: Components
   // -----------------------------------------------------------------------------
+  import CopyProject from './pages/copy-project/copy-project-page.svelte';
   import EditProject from './pages/edit-project/edit-project-page.svelte';
   import NewProject from './pages/new-project/new-project-page.svelte';
   import ProjectReport from './pages/project-report/project-report-page.svelte';
@@ -23,6 +24,7 @@
   // MARK: Globals
   // -----------------------------------------------------------------------------
   const pageMap = new SvelteMap([
+    ['copy-project', CopyProject],
     ['edit-project', EditProject],
     ['new-project', NewProject],
     ['project-report', ProjectReport],
