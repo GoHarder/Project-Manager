@@ -21,7 +21,7 @@
   import { Menu, MenuItem } from '@moss/comp/menu';
   import { TextField } from '@moss/comp/text-field';
 
-  import { Page, ErrorSt } from '../../components/index';
+  import { Page, ErrorSt, ProjectListSt } from '../../components/index';
   import { ProjectItem } from './components/index';
 
   // MARK: Stores
@@ -43,7 +43,7 @@
   // -----------------------------------------------------------------------------
   // MARK: State
   // -----------------------------------------------------------------------------
-  let projects = $state<App.ProjectDoc[]>([]);
+  // let projects = $state<App.ProjectDoc[]>([]);
   let selected = $state<App.ProjectDoc>();
   let menuOpen = $state(false);
 
@@ -61,11 +61,13 @@
   // MARK: Derived
   // -----------------------------------------------------------------------------
   let completedProjects = $derived(
-    projects.filter((project) => project.completed !== null),
+    ProjectListSt.data.filter((project) => project.completed !== null),
+    // projects.filter((project) => project.completed !== null),
   );
 
   let liveProjects = $derived(
-    projects.filter((project) => project.completed === null),
+    ProjectListSt.data.filter((project) => project.completed === null),
+    // projects.filter((project) => project.completed === null),
   );
 
   let validSearch = $derived(searchSchema.safeParse(search).success);
@@ -95,7 +97,10 @@
   }
 
   function promptDialog(name: string, contractNo: string) {
-    selected = projects.find((project) => project.contractNo === contractNo);
+    selected = ProjectListSt.data.find(
+      (project) => project.contractNo === contractNo,
+    );
+    // selected = projects.find((project) => project.contractNo === contractNo);
     dialogName = name;
     dialogOpen = true;
   }
@@ -115,17 +120,19 @@
     menuOpen = !menuOpen;
   }
 
-  // TODO: 2-05-2026 10:51 AM
+  // TODO: 2-17-2026 4:05 PM
+  // Check if the store fixed the issue
+  // -----------------------------------------------------------------
   // Every time you load this component it adds another event listener
-  // NOTE: This may only happen when in development mode
-  window.api.listen.projects((update) => {
-    projects = update;
-  });
+  // window.api.listen.projects((update) => {
+  //   projects = update;
+  // });
 
   // MARK: Lifecycle
   // -----------------------------------------------------------------------------
   onMount(() => {
-    if (projects.length === 0) window.api.projects.get();
+    if (ProjectListSt.data.length === 0) window.api.projects.get();
+    // if (projects.length === 0) window.api.projects.get();
   });
 </script>
 

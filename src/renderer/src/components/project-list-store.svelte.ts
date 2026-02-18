@@ -1,11 +1,15 @@
 // MARK: Globals
 // -----------------------------------------------------------------------------
-class SimpleStore<T> {
-  data = $state<T>();
+class ProjectStore {
+  data: App.ProjectDoc[] = $state([]);
+
+  constructor() {
+    window.api.listen.projects((update) => {
+      this.data = update;
+    });
+  }
 }
 
 // MARK: Library
 // -----------------------------------------------------------------------------
-export const ProjectSt = new SimpleStore<App.ProjectDoc>();
-
-export const ErrorSt = new SimpleStore<App.MainError['error']>();
+export default new ProjectStore();
