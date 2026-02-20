@@ -43,7 +43,6 @@
   // -----------------------------------------------------------------------------
   // MARK: State
   // -----------------------------------------------------------------------------
-  // let projects = $state<App.ProjectDoc[]>([]);
   let selected = $state<App.ProjectDoc>();
   let menuOpen = $state(false);
 
@@ -67,7 +66,6 @@
 
   let liveProjects = $derived(
     ProjectListSt.data.filter((project) => project.completed === null),
-    // projects.filter((project) => project.completed === null),
   );
 
   let validSearch = $derived(searchSchema.safeParse(search).success);
@@ -100,7 +98,6 @@
     selected = ProjectListSt.data.find(
       (project) => project.contractNo === contractNo,
     );
-    // selected = projects.find((project) => project.contractNo === contractNo);
     dialogName = name;
     dialogOpen = true;
   }

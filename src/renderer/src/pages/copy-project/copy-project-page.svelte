@@ -69,9 +69,9 @@
     const srcNo = ProjectSt.data.contractNo || '';
 
     window.api.projects.postCopy(srcNo, {
-      customerName,
-      contractNo,
-      poNo,
+      customerName: customerName.trim(),
+      contractNo: contractNo.trim(),
+      poNo: poNo.trim(),
       price,
       currency,
     });

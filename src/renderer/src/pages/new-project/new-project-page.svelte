@@ -66,9 +66,9 @@
     event.preventDefault();
 
     window.api.projects.post({
-      customerName,
-      contractNo,
-      poNo,
+      customerName: customerName.trim(),
+      contractNo: contractNo.trim(),
+      poNo: poNo.trim(),
       price,
       currency,
     });
