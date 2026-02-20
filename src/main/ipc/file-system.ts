@@ -1,9 +1,15 @@
 // MARK: Imports
 // -----------------------------------------------------------------------------
+// - Node
+import { join } from 'node:path';
 // - NPM
 import { ipcMain, shell } from 'electron';
 // - Local
-import { findProjectPath } from '../lib/file-system';
+import {
+  dirEntryExists,
+  findProjectPath,
+  readJsonFile,
+} from '../lib/file-system';
 
 // MARK: Types
 // -----------------------------------------------------------------------------
@@ -27,9 +33,16 @@ async function searchFolder(_event, contractNo: string) {
 
   if (!projectDir.success) return projectDir;
 
-  shell.openPath(projectDir.data);
+  const dataPath = join(projectDir.data, 'data.json');
+  const dataExists = await dirEntryExists(dataPath);
 
-  return { success: true as const, data: '' };
+  if (!dataExists) return { success: true as const, data: { contractNo } };
+
+  const readRes = await readJsonFile<App.ProjectDoc>(dataPath);
+
+  if (!readRes.success) return readRes;
+
+  return { success: true as const, data: readRes.data };
 }
 
 // MARK: Library

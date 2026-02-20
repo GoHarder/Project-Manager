@@ -56,6 +56,7 @@
   // MARK: Derived
   // -----------------------------------------------------------------------------
   let iconText = $derived(project.completed ? 'folder_check' : 'folder');
+  let hasDataFile = $derived(project.created !== undefined);
 
   // MARK: Effects
   // -----------------------------------------------------------------------------
@@ -114,42 +115,51 @@
     <div data-slot="headline">Open folder</div>
     <Icon data-slot="end">folder_open</Icon>
   </MenuItem>
-  <MenuItem onclick={onEmail}>
-    <div data-slot="headline">New email</div>
-    <Icon data-slot="end">email</Icon>
-  </MenuItem>
+  {#if hasDataFile}
+    <MenuItem onclick={onEmail}>
+      <div data-slot="headline">New email</div>
+      <Icon data-slot="end">email</Icon>
+    </MenuItem>
+  {/if}
 {/snippet}
 
 {#snippet editMenu()}
-  <SubMenu>
-    <MenuItem data-slot="item">
-      <div data-slot="headline">Edit</div>
-      <Icon data-slot="end">arrow_right</Icon>
+  {#if hasDataFile}
+    <SubMenu>
+      <MenuItem data-slot="item">
+        <div data-slot="headline">Edit</div>
+        <Icon data-slot="end">arrow_right</Icon>
+      </MenuItem>
+      <Menu data-slot="menu">
+        <MenuItem onclick={onEdit}>
+          <div data-slot="headline">Properties</div>
+          <Icon data-slot="end">edit</Icon>
+        </MenuItem>
+        <MenuItem onclick={onCopy}>
+          <div data-slot="headline">Copy</div>
+          <Icon data-slot="end">folder_copy</Icon>
+        </MenuItem>
+        {#if canComplete}
+          <MenuItem onclick={onComplete}>
+            <div data-slot="headline">Complete</div>
+            <Icon data-slot="end">folder_check</Icon>
+          </MenuItem>
+        {/if}
+        {#if onDelete}
+          <Divider role="separator" tabindex="-1" />
+          <MenuItem onclick={onDelete}>
+            <div data-slot="headline">Delete</div>
+            <Icon data-slot="end">folder_delete</Icon>
+          </MenuItem>
+        {/if}
+      </Menu>
+    </SubMenu>
+  {:else}
+    <MenuItem onclick={onCopy}>
+      <div data-slot="headline">Copy</div>
+      <Icon data-slot="end">folder_copy</Icon>
     </MenuItem>
-    <Menu data-slot="menu">
-      <MenuItem onclick={onEdit}>
-        <div data-slot="headline">Properties</div>
-        <Icon data-slot="end">edit</Icon>
-      </MenuItem>
-      <MenuItem onclick={onCopy}>
-        <div data-slot="headline">Copy</div>
-        <Icon data-slot="end">folder_copy</Icon>
-      </MenuItem>
-      {#if canComplete}
-        <MenuItem onclick={onComplete}>
-          <div data-slot="headline">Complete</div>
-          <Icon data-slot="end">folder_check</Icon>
-        </MenuItem>
-      {/if}
-      {#if onDelete}
-        <Divider role="separator" tabindex="-1" />
-        <MenuItem onclick={onDelete}>
-          <div data-slot="headline">Delete</div>
-          <Icon data-slot="end">folder_delete</Icon>
-        </MenuItem>
-      {/if}
-    </Menu>
-  </SubMenu>
+  {/if}
 {/snippet}
 
 {#snippet clipboardMenu()}
@@ -177,9 +187,12 @@
 
 <ListItem>
   <Icon data-slot="start">{iconText}</Icon>
-  <div data-slot="headline">{project.contractNo} {project.customerName}</div>
+  <div data-slot="headline">
+    {project.contractNo}
+    {project.customerName || ''}
+  </div>
 
-  {#if !project.completed}
+  {#if !project.completed && hasDataFile}
     <div data-slot="supporting-text">Created {dateString(project.created)}</div>
   {/if}
 
@@ -199,7 +212,9 @@
     >
       {@render projectMenu()}
       {@render editMenu()}
-      {@render clipboardMenu()}
+      {#if hasDataFile}
+        {@render clipboardMenu()}
+      {/if}
     </Menu>
   </span>
 </ListItem>

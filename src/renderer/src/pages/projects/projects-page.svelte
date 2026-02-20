@@ -56,12 +56,12 @@
 
   let searchOpen = $state(false);
   let search = $state<string>();
+  let searchRes = $state<App.ProjectDoc>();
 
   // MARK: Derived
   // -----------------------------------------------------------------------------
   let completedProjects = $derived(
     ProjectListSt.data.filter((project) => project.completed !== null),
-    // projects.filter((project) => project.completed !== null),
   );
 
   let liveProjects = $derived(
@@ -90,6 +90,8 @@
       ErrorSt.data = result.error;
       return;
     }
+
+    searchRes = result.data;
     search = undefined;
     searchOpen = false;
   }
@@ -129,7 +131,6 @@
   // -----------------------------------------------------------------------------
   onMount(() => {
     if (ProjectListSt.data.length === 0) window.api.projects.get();
-    // if (projects.length === 0) window.api.projects.get();
   });
 </script>
 
@@ -232,6 +233,12 @@
           <div data-slot="headline">Project report</div>
           <Icon data-slot="start">table</Icon>
         </MenuItem>
+
+        <MenuItem disabled>
+          <div data-slot="headline">Shortcuts</div>
+          <Icon data-slot="start">jump_to_element</Icon>
+        </MenuItem>
+
         <MenuItem onclick={() => setPage('settings')}>
           <div data-slot="headline">Settings</div>
           <Icon data-slot="start">settings</Icon>
@@ -256,6 +263,15 @@
 
 <Page {slot_headline}>
   <div class="cards">
+    {#if searchRes}
+      <div class="card">
+        <h2>Search results</h2>
+        <List>
+          <ProjectItem project={searchRes} {setPage} />
+        </List>
+      </div>
+    {/if}
+
     <div class="card">
       <h2>Live projects</h2>
       <List>
@@ -288,7 +304,7 @@
 <style lang="scss">
   @use '../../assets/scss/mixin';
   .cards {
-    --grid-max-col-qty: 2;
+    --grid-max-col-qty: 3;
     --grid-gap: 8px;
     --grid-min-col-width: 400px;
 
@@ -307,6 +323,7 @@
       auto-fit,
       minmax(var(--grid-col-min-size-calc), 1fr)
     );
+    align-items: start;
   }
 
   .card {

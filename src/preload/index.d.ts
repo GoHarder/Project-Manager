@@ -6,6 +6,10 @@ type NewProjectDoc = Pick<
   'customerName' | 'contractNo' | 'poNo' | 'price' | 'currency'
 >;
 
+type SearchResult = Oneof<
+  [{ success: true; data: Partial<App.ProjectDoc> }, App.MainError]
+>;
+
 declare global {
   interface Window {
     electron: ElectronAPI;
@@ -15,9 +19,7 @@ declare global {
       };
       fs: {
         openFolder: (contractNo: string) => void;
-        searchFolder: (
-          contractNo: string,
-        ) => Oneof<[{ success: true; data: string }, App.MainError]>;
+        searchFolder: (contractNo: string) => SearchResult;
       };
       listen: {
         error: (cb: (update: App.MainError) => void) => void;
