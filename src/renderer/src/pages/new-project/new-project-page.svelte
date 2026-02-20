@@ -1,5 +1,6 @@
 <script lang="ts">
-  import z from 'zod';
+  // import z from 'zod';
+  import { projectFormSchema } from '../../lib/zod-schema';
 
   // MARK: Types
   // -----------------------------------------------------------------------------
@@ -26,14 +27,6 @@
 
   // MARK: Globals
   // -----------------------------------------------------------------------------
-  const formSchema = z.object({
-    customerName: z.string().nonempty(),
-    contractNo: z.string().min(6),
-    poNo: z.string().nonempty(),
-    price: z.number().min(0),
-    currency: z.string().nonempty(),
-  });
-
   // MARK: Helpers
   // -----------------------------------------------------------------------------
   // MARK: State
@@ -53,7 +46,7 @@
   // -----------------------------------------------------------------------------
   $effect(() => {
     const rawData = { customerName, contractNo, poNo, price, currency };
-    valid = formSchema.safeParse(rawData).success;
+    valid = projectFormSchema.safeParse(rawData).success;
   });
 
   // MARK: Contexts
