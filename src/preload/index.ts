@@ -7,8 +7,9 @@ const api = {
     get: (project, options) => ipcRenderer.send('get:email', project, options),
   },
   fs: {
-    openFolder: (contractNo: string) =>
-      ipcRenderer.send('get:fs-folder-open', contractNo),
+    openFolder: (path: string) => ipcRenderer.send('get:fs-folder-open', path),
+    openProjectFolder: (contractNo: string) =>
+      ipcRenderer.send('get:fs-folder-open-project', contractNo),
     searchFolder: (contractNo: string) =>
       ipcRenderer.invoke('get:fs-folder-search', contractNo),
   },

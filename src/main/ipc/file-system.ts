@@ -17,7 +17,11 @@ import { type IpcMainEvent } from 'electron';
 
 // MARK: Handlers
 // -----------------------------------------------------------------------------
-async function openFolder(event: IpcMainEvent, contractNo: string) {
+async function openFolder(_event: IpcMainEvent, path: string) {
+  shell.openPath(path);
+}
+
+async function openProjectFolder(event: IpcMainEvent, contractNo: string) {
   const projectDir = await findProjectPath(contractNo);
 
   if (!projectDir.success) {
@@ -49,5 +53,6 @@ async function searchFolder(_event, contractNo: string) {
 // -----------------------------------------------------------------------------
 export default function () {
   ipcMain.handle('get:fs-folder-search', searchFolder);
+  ipcMain.on('get:fs-folder-open-project', openProjectFolder);
   ipcMain.on('get:fs-folder-open', openFolder);
 }

@@ -18,7 +18,8 @@ declare global {
         get: (project: App.ProjectDoc, options: App.EmailOptions) => void;
       };
       fs: {
-        openFolder: (contractNo: string) => void;
+        openFolder: (path: string) => void;
+        openProjectFolder: (contractNo: string) => void;
         searchFolder: (contractNo: string) => SearchResult;
       };
       listen: {

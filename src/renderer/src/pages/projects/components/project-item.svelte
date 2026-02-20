@@ -99,7 +99,7 @@
   }
 
   function onOpen() {
-    window.api.fs.openFolder(project.contractNo);
+    window.api.fs.openProjectFolder(project.contractNo);
   }
 
   function toggleMenu() {

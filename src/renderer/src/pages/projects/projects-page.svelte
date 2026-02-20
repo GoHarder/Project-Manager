@@ -18,7 +18,7 @@
   import { IconButton } from '@moss/comp/icon-button';
   import { Icon } from '@moss/comp/icon';
   import { List } from '@moss/comp/list';
-  import { Menu, MenuItem } from '@moss/comp/menu';
+  import { Menu, MenuItem, SubMenu } from '@moss/comp/menu';
   import { TextField } from '@moss/comp/text-field';
 
   import { Page, ErrorSt, ProjectListSt } from '../../components/index';
@@ -82,6 +82,10 @@
     dialogOpen = false;
     const snap = $state.snapshot(selected);
     window.api.projects.delete(snap.contractNo);
+  }
+
+  function onShortcut(path: string) {
+    window.api.fs.openFolder(path);
   }
 
   async function onSearch() {
@@ -233,12 +237,25 @@
           <div data-slot="headline">Project report</div>
           <Icon data-slot="start">table</Icon>
         </MenuItem>
-
-        <MenuItem disabled>
-          <div data-slot="headline">Shortcuts</div>
-          <Icon data-slot="start">jump_to_element</Icon>
-        </MenuItem>
-
+        <SubMenu>
+          <MenuItem data-slot="item">
+            <div data-slot="headline">Shortcuts</div>
+            <Icon data-slot="start">jump_to_element</Icon>
+            <Icon data-slot="end">arrow_right</Icon>
+          </MenuItem>
+          <Menu data-slot="menu">
+            <MenuItem onclick={() => onShortcut('N:\\Drawings')}>
+              <div data-slot="headline">Drawings</div>
+              <Icon data-slot="end">folder</Icon>
+            </MenuItem>
+            <MenuItem
+              onclick={() => onShortcut('N:\\Drawings\\FILLABLE DRAWINGS')}
+            >
+              <div data-slot="headline">Fillable drawings</div>
+              <Icon data-slot="end">folder</Icon>
+            </MenuItem>
+          </Menu>
+        </SubMenu>
         <MenuItem onclick={() => setPage('settings')}>
           <div data-slot="headline">Settings</div>
           <Icon data-slot="start">settings</Icon>
