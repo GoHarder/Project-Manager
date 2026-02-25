@@ -14,6 +14,7 @@ declare global {
   interface Window {
     electron: ElectronAPI;
     api: {
+      quit: () => void;
       email: {
         get: (project: App.ProjectDoc, options: App.EmailOptions) => void;
       };

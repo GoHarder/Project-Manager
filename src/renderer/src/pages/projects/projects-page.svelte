@@ -261,7 +261,7 @@
           <Icon data-slot="start">settings</Icon>
         </MenuItem>
         <Divider role="separator" tabindex="-1" />
-        <MenuItem>
+        <MenuItem onclick={() => window.api.quit()}>
           <div data-slot="headline">Exit</div>
           <Icon data-slot="start">close</Icon>
         </MenuItem>
@@ -284,7 +284,11 @@
       <div class="card">
         <h2>Search results</h2>
         <List>
-          <ProjectItem project={searchRes} {setPage} />
+          <ProjectItem
+            project={searchRes}
+            {setPage}
+            onEmail={() => promptDialog('email', searchRes.contractNo)}
+          />
         </List>
       </div>
     {/if}

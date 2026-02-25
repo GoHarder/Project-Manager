@@ -3,7 +3,7 @@
 // - Node
 import { join } from 'node:path';
 // - NPM
-import { app, shell, BrowserWindow } from 'electron';
+import { app, shell, BrowserWindow, ipcMain } from 'electron';
 import { electronApp, optimizer, is } from '@electron-toolkit/utils';
 // - Local
 import icon from '../../resources/icon.png?asset';
@@ -65,6 +65,10 @@ app.whenReady().then(async () => {
   });
 
   const init = await initSettings();
+
+  ipcMain.on('quit', (_event) => {
+    app.quit();
+  });
 
   emlIpc();
   fileSystemIpc();

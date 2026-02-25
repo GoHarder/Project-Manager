@@ -3,6 +3,7 @@ import { electronAPI } from '@electron-toolkit/preload';
 
 // Custom APIs for renderer
 const api = {
+  quit: () => ipcRenderer.send('quit'),
   email: {
     get: (project, options) => ipcRenderer.send('get:email', project, options),
   },
