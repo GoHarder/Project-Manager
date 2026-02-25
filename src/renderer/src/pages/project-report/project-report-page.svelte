@@ -7,6 +7,8 @@
     setPage: (page: string) => void;
   };
 
+  type ReportSection = ReturnType<typeof calculateTable>;
+
   // MARK: Components
   // -----------------------------------------------------------------------------
   import { Elevation } from '@moss/comp/elevation';
@@ -52,6 +54,24 @@
     return formatter.format(price);
   }
 
+  function convert(price: number, units: string) {
+    if (units === 'USD') return price;
+    return ((price || 0) / 1.55) * 0.9;
+  }
+
+  function calculateTable(section: App.ProjectReport['thisWeek' | 'lastWeek']) {
+    let { monday, projects, total } = section;
+
+    const projectsUpdate = projects.map((row) => {
+      const adjPrice = convert(row.price, row.currency);
+      return { ...row, adjPrice };
+    });
+
+    const totalUpdate = total.USD + convert(total.CAD, 'CAD');
+
+    return { monday, projects: projectsUpdate, total: totalUpdate };
+  }
+
   // MARK: State
   // -----------------------------------------------------------------------------
   let report = $state<App.ProjectReport>({
@@ -61,6 +81,14 @@
 
   // MARK: Derived
   // -----------------------------------------------------------------------------
+  let calcReport = $derived.by(() => {
+    const { thisWeek, lastWeek } = report;
+    return {
+      thisWeek: calculateTable(thisWeek),
+      lastWeek: calculateTable(lastWeek),
+    };
+  });
+
   // MARK: Effects
   // -----------------------------------------------------------------------------
   // MARK: Contexts
@@ -69,11 +97,10 @@
   // -----------------------------------------------------------------------------
   // MARK: Events
   // -----------------------------------------------------------------------------
-  function copyTable(projects: App.ProjectDoc[]) {
+  function copyTable(projects: ReportSection['projects']) {
     const lines = projects.map((project) => {
-      const { completed, contractNo, customerName, price, user, currency } =
-        project;
-      return `${dateString(completed)}\t${priceString(price)} ${currency}\t${contractNo}\t${customerName}\t${user}`;
+      const { completed, contractNo, customerName, user, adjPrice } = project;
+      return `${dateString(completed)}\t${priceString(adjPrice)}\t${contractNo}\t${customerName}\t${user}`;
     });
 
     const text = lines.join('\n');
@@ -116,75 +143,70 @@
   <h1>Project report</h1>
 {/snippet}
 
-{#snippet tableRow(project: App.ProjectDoc)}
+{#snippet tableRow(project: ReportSection['projects'][number])}
   <tr>
     <td>{dateString(project.completed)}</td>
     <td>{project.contractNo}</td>
     <td>{project.customerName}</td>
     <td>{project.user}</td>
-    <td>{priceString(project.price)}</td>
-    <td>{project.currency}</td>
+    <td
+      >{priceString(project.price)}{project.currency !== 'USD'
+        ? ' - CAD'
+        : ''}</td
+    >
+    <!-- <td>{project.currency}</td> -->
+    <td>{priceString(project.adjPrice)}</td>
   </tr>
 {/snippet}
 
-{#snippet reportTable(section: App.ProjectReport['thisWeek' | 'lastWeek'])}
-  <!-- {#if section.projects.length > 0} -->
-  <div class="elevated-card">
-    <Elevation />
-    <table>
-      <caption>
-        <span class="caption">
-          Week of {dateString(section.monday)}
-          <IconButton
-            tooltip="Copy table"
-            onclick={() => {
-              copyTable(section.projects);
-            }}
-          >
-            <Icon>backup_table</Icon>
-          </IconButton>
-        </span>
-      </caption>
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Contract</th>
-          <th>Customer</th>
-          <th>Engineer</th>
-          <th>Price</th>
-          <th>Units </th>
-        </tr>
-      </thead>
-      <tbody>
-        {#each section.projects as project (project._id)}
-          {@render tableRow(project)}
-        {/each}
-      </tbody>
-      <tfoot>
-        {#if section.total.USD}
+{#snippet reportTable(section: ReportSection)}
+  {#if section.projects.length > 0}
+    <div class="elevated-card">
+      <Elevation />
+      <table>
+        <caption>
+          <span class="caption">
+            Week of {dateString(section.monday)}
+            <IconButton
+              tooltip="Copy table"
+              onclick={() => {
+                copyTable(section.projects);
+              }}
+            >
+              <Icon>backup_table</Icon>
+            </IconButton>
+          </span>
+        </caption>
+        <thead>
           <tr>
-            <th class="total" scope="row" colspan="4">Total: </th>
-            <th>{priceString(section.total.USD)}</th>
-            <th>USD</th>
+            <th>Date</th>
+            <th>Contract</th>
+            <th>Customer</th>
+            <th>Engineer</th>
+            <th>Price</th>
+            <th>Adjusted price</th>
           </tr>
-        {/if}
-        {#if section.total.CAD}
+        </thead>
+        <tbody>
+          {#each section.projects as project (project._id)}
+            {@render tableRow(project)}
+          {/each}
+        </tbody>
+        <tfoot>
           <tr>
-            <th class="total" scope="row" colspan="4">Total: </th>
-            <th>{priceString(section.total.CAD)}</th>
-            <th>CAD</th>
+            <th class="total" scope="row" colspan="5">Total: </th>
+            <th>{priceString(section.total)}</th>
           </tr>
-        {/if}
-      </tfoot>
-    </table>
-  </div>
-  <!-- {/if} -->
+        </tfoot>
+      </table>
+    </div>
+  {/if}
 {/snippet}
 
 <Page {slot_headline}>
   <div class="tables">
-    {@render reportTable(report.lastWeek)}
-    {@render reportTable(report.thisWeek)}
+    {@render reportTable(calcReport.lastWeek)}
+    {@render reportTable(calcReport.thisWeek)}
   </div>
 </Page>
 
