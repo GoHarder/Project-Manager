@@ -63,7 +63,12 @@
   // -----------------------------------------------------------------------------
   function onsubmit(event: SubmitEvent) {
     event.preventDefault();
-    window.api.settings.put({ firstName, lastName, email, server });
+    window.api.settings.put({
+      firstName,
+      lastName,
+      email: email.toLowerCase(),
+      server,
+    });
     formEle.reset();
     setPage('projects');
   }

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { projectFormSchema } from '../../lib/zod-schema';
+
   // MARK: Types
   // -----------------------------------------------------------------------------
   type Props = {
@@ -43,10 +45,16 @@
 
   // MARK: State
   // -----------------------------------------------------------------------------
+  let valid = $state(false);
+
   // MARK: Derived
   // -----------------------------------------------------------------------------
   // MARK: Effects
   // -----------------------------------------------------------------------------
+  $effect(() => {
+    valid = projectFormSchema.safeParse(ProjectSt.data).success;
+  });
+
   // MARK: Contexts
   // -----------------------------------------------------------------------------
   // MARK: Subscriptions
@@ -57,6 +65,7 @@
     event.preventDefault();
     setTimeout(() => {
       const snap = $state.snapshot(ProjectSt.data);
+      snap.user = snap.user.toLowerCase();
       window.api.projects.put(snap);
       setPage('projects');
     }, 1000);
@@ -109,7 +118,7 @@
           min="0"
           step="0.01"
         />
-        <TextField label="Work Email" bind:value={ProjectSt.data.user} />
+        <TextField label="Work email" bind:value={ProjectSt.data.user} />
         <Select label="Currency" bind:value={ProjectSt.data.currency}>
           <Option value="USD">USD</Option>
           <Option value="CAD">CAD</Option>
@@ -119,7 +128,7 @@
           <label for="bookmarked">Bookmarked</label>
         </div>
         <div class="actions">
-          <Button variant="filled">
+          <Button variant="filled" disabled={!valid}>
             <Icon data-slot="icon">save</Icon>
             Save
           </Button>
