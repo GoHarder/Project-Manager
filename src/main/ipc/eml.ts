@@ -39,6 +39,12 @@ const templates = [
     hasSheave: false,
     file: 'no-dwgs-no-changes.html',
   },
+  {
+    drawings: false,
+    orderChange: false,
+    hasSheave: true,
+    file: 'no-dwgs-no-changes-ts.html',
+  },
 ];
 
 // MARK: Helpers
@@ -109,6 +115,28 @@ async function loadPdf(contractNo: string, defaultPath: string) {
   return { success: true as const, data };
 }
 
+async function loadImage(fileName: string) {
+  const path = join(
+    import.meta.dirname,
+    '../../resources/email-templates/assets',
+    fileName,
+  );
+  const readRes = await readFile(path, 'base64');
+  if (!readRes.success) return readRes;
+
+  return {
+    success: true as const,
+    data:
+      `--${boundary}\n` +
+      `Content-Type: image/png; name="${fileName}"\n` +
+      `Content-Description: ${fileName}\n` +
+      `Content-Transfer-Encoding: base64\n` +
+      `Content-ID: <${fileName}@01DC0077.FF545F60>\n` +
+      `Content-Disposition: inline\n\n` +
+      `${readRes.data}\n`,
+  };
+}
+
 // MARK: Handlers
 // -----------------------------------------------------------------------------
 async function buildEml(
@@ -164,10 +192,23 @@ async function buildEml(
     emlData += load2.data;
   }
 
+  if (options.hasSheave) {
+    const load3 = await loadImage('traction-sheave.png');
+
+    if (!load3.success) {
+      event.reply('send:error', load3.error);
+      return;
+    }
+
+    emlData += load3.data;
+  }
+
   emlData += end;
 
+  const fileName = subject.replace(/[\.<>:"/\\|?*]/g, '-');
+
   const writeRes = await writeFile(
-    join(findPath.data, `${subject}.eml`),
+    join(findPath.data, `${fileName}.eml`),
     emlData,
   );
 
