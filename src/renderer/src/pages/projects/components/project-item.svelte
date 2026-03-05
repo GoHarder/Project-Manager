@@ -57,6 +57,7 @@
   // -----------------------------------------------------------------------------
   let iconText = $derived(project.completed ? 'folder_check' : 'folder');
   let hasDataFile = $derived(project.created !== undefined);
+  let canada = $derived(project.currency === 'CAD' ? 'canada' : '');
 
   // MARK: Effects
   // -----------------------------------------------------------------------------
@@ -133,7 +134,7 @@
       <Menu data-slot="menu">
         <MenuItem onclick={onEdit}>
           <div data-slot="headline">Properties</div>
-          <Icon data-slot="end">edit</Icon>
+          <Icon data-slot="end">bookmark_manager</Icon>
         </MenuItem>
         <MenuItem onclick={onCopy}>
           <div data-slot="headline">Copy</div>
@@ -185,7 +186,7 @@
   </SubMenu>
 {/snippet}
 
-<ListItem>
+<ListItem class={{ 'canada-project': canada }}>
   <Icon data-slot="start">{iconText}</Icon>
   <div data-slot="headline">
     {project.contractNo}
@@ -218,6 +219,3 @@
     </Menu>
   </span>
 </ListItem>
-
-<!-- <style lang="scss">
-</style> -->
