@@ -1,5 +1,4 @@
 <script lang="ts">
-  // import z from 'zod';
   import { projectFormSchema } from '../../lib/zod-schema';
 
   // MARK: Types
@@ -39,6 +38,7 @@
   let poNo = $state<string>();
   let price = $state<number>();
   let currency = $state<string>('USD');
+  let dueDate = $state<string>();
 
   // MARK: Derived
   // -----------------------------------------------------------------------------
@@ -64,6 +64,7 @@
       poNo: poNo.trim(),
       price,
       currency,
+      dueDate,
     });
 
     formEle.reset();
@@ -92,6 +93,7 @@
       <TextField label="Customer name" bind:value={customerName} />
       <TextField label="Contract number" bind:value={contractNo} />
       <TextField label="Purchase order number" bind:value={poNo} />
+      <TextField label="Due date" type="date" bind:value={dueDate} />
       <NumberField
         label="Price"
         bind:value={price}

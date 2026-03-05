@@ -57,15 +57,11 @@ async function fetchProjects() {
  */
 async function postProject(event: IpcMainEvent, project: App.ProjectDoc) {
   const { APP_SERVER, USER_EMAIL } = process.env;
-  const { contractNo, customerName, poNo, price, currency } = project;
+  const { contractNo, customerName } = project;
   const baseDir = getProjectDir(contractNo);
   const dirName = `${contractNo} ${customerName}`;
   const reqBody = {
-    customerName,
-    contractNo,
-    poNo,
-    price,
-    currency,
+    ...project,
     user: USER_EMAIL,
   };
 
@@ -225,7 +221,7 @@ async function putProject(event: IpcMainEvent, update: App.ProjectDoc) {
     if (!res.ok) {
       event.reply('send:error', {
         name: 'HTTPError',
-        message: resBody.message || 'Unknown Error',
+        message: resBody.message || res.statusText || 'Unknown Error',
         code: `${res.status}`,
       });
       return;

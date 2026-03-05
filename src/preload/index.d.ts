@@ -3,7 +3,7 @@ import { OneOf } from '@moss/types';
 
 type NewProjectDoc = Pick<
   App.ProjectDoc,
-  'customerName' | 'contractNo' | 'poNo' | 'price' | 'currency'
+  'customerName' | 'contractNo' | 'poNo' | 'price' | 'currency' | 'dueDate'
 >;
 
 type SearchResult = Oneof<
@@ -24,7 +24,7 @@ declare global {
         searchFolder: (contractNo: string) => SearchResult;
       };
       listen: {
-        error: (cb: (update: App.MainError) => void) => void;
+        error: (cb: (update: App.MainError['error']) => void) => void;
         projects: (cb: (update: App.ProjectDoc[]) => void) => void;
       };
       projects: {

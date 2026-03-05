@@ -111,6 +111,11 @@
           label="Purchase order number"
           bind:value={ProjectSt.data.poNo}
         />
+        <TextField
+          label="Due date"
+          type="date"
+          bind:value={ProjectSt.data.dueDate}
+        />
         <NumberField
           label="Price"
           bind:value={ProjectSt.data.price}

@@ -38,6 +38,7 @@ declare global {
       contractNo: string;
       created: string;
       customerName: string;
+      dueDate: string;
       poNo: string;
       price: number;
       currency: string;
