@@ -99,8 +99,8 @@
   // -----------------------------------------------------------------------------
   function copyTable(projects: ReportSection['projects']) {
     const lines = projects.map((project) => {
-      const { completed, contractNo, customerName, user, adjPrice } = project;
-      return `${dateString(completed)}\t${priceString(adjPrice)}\t${contractNo}\t${customerName}\t${user}`;
+      const { completed, contractNo, customerName, adjPrice, poNo } = project;
+      return `${customerName}\t${contractNo}\t${priceString(adjPrice)}\t${poNo}\tTRUE\t${dateString(completed)}`;
     });
 
     const text = lines.join('\n');
@@ -117,16 +117,6 @@
       ErrorSt.data = res.error;
       return;
     }
-
-    res.data.lastWeek.projects.map((row) => {
-      row.user = row.user.replace(/@.*$/, '');
-      return row;
-    });
-
-    res.data.thisWeek.projects.map((row) => {
-      row.user = row.user.replace(/@.*$/, '');
-      return row;
-    });
 
     report = res.data;
   });
@@ -148,13 +138,11 @@
     <td>{dateString(project.completed)}</td>
     <td>{project.contractNo}</td>
     <td>{project.customerName}</td>
-    <td>{project.user}</td>
     <td
       >{priceString(project.price)}{project.currency !== 'USD'
         ? ' - CAD'
         : ''}</td
     >
-    <!-- <td>{project.currency}</td> -->
     <td>{priceString(project.adjPrice)}</td>
   </tr>
 {/snippet}
@@ -182,7 +170,6 @@
             <th>Date</th>
             <th>Contract</th>
             <th>Customer</th>
-            <th>Engineer</th>
             <th>Price</th>
             <th>Adjusted price</th>
           </tr>
@@ -194,7 +181,7 @@
         </tbody>
         <tfoot>
           <tr>
-            <th class="total" scope="row" colspan="5">Total: </th>
+            <th class="total" scope="row" colspan="4">Total: </th>
             <th>{priceString(section.total)}</th>
           </tr>
         </tfoot>
