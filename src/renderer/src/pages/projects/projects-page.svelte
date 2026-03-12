@@ -22,7 +22,12 @@
   import { TextField } from '@moss/comp/text-field';
 
   import { Page, ErrorSt, ProjectListSt } from '../../components/index';
-  import { ProjectItem } from './components/index';
+  import {
+    CardList,
+    CompletedProjectItem,
+    LiveProjectItem,
+    ProjectItem,
+  } from './components/index';
 
   // MARK: Stores
   // -----------------------------------------------------------------------------
@@ -122,14 +127,6 @@
   function toggleMenu() {
     menuOpen = !menuOpen;
   }
-
-  // TODO: 2-17-2026 4:05 PM
-  // Check if the store fixed the issue
-  // -----------------------------------------------------------------
-  // Every time you load this component it adds another event listener
-  // window.api.listen.projects((update) => {
-  //   projects = update;
-  // });
 
   // MARK: Lifecycle
   // -----------------------------------------------------------------------------
@@ -292,33 +289,25 @@
         </List>
       </div>
     {/if}
-
-    <div class="card">
-      <h2>Live projects</h2>
-      <List>
-        {#each liveProjects as project (project._id)}
-          <ProjectItem
-            {project}
-            {setPage}
-            can-complete
-            onDelete={() => promptDialog('delete', project.contractNo)}
-            onEmail={() => promptDialog('email', project.contractNo)}
-          />
-        {/each}
-      </List>
-    </div>
-    <div class="card">
-      <h2>Completed projects</h2>
-      <List>
-        {#each completedProjects as project (project._id)}
-          <ProjectItem
-            {project}
-            {setPage}
-            onEmail={() => promptDialog('email', project.contractNo)}
-          />
-        {/each}
-      </List>
-    </div>
+    <CardList label="Live projects">
+      {#each liveProjects as project (project._id)}
+        <LiveProjectItem
+          {project}
+          {setPage}
+          onDelete={() => promptDialog('delete', project.contractNo)}
+          onEmail={() => promptDialog('email', project.contractNo)}
+        />
+      {/each}
+    </CardList>
+    <CardList label="Completed projects">
+      {#each completedProjects as project (project._id)}
+        <CompletedProjectItem
+          {project}
+          {setPage}
+          onEmail={() => promptDialog('email', project.contractNo)}
+        />
+      {/each}
+    </CardList>
   </div>
 </Page>
 
@@ -358,8 +347,14 @@
     h2 {
       @include mixin.text-style('title-medium');
       margin-block: 0;
-      padding-inline: 16px;
     }
+  }
+
+  .card-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-inline: 16px;
   }
 
   .option {
