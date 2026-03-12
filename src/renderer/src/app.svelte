@@ -64,7 +64,7 @@
 
   window.api.listen.error((update) => {
     if (!update) return;
-    error = update.error;
+    error = update;
     dialogOpen = true;
   });
 
@@ -76,10 +76,10 @@
   <div data-slot="headline">{error?.name || 'Unknown Error'}</div>
 
   <div data-slot="content">
+    <p>{error?.message || 'Unknown Error'}</p>
     {#if error?.code}
       <p>Code: {error.code}</p>
     {/if}
-    <p>{error?.message || 'Unknown Error'}</p>
   </div>
   <div data-slot="actions">
     <Button onclick={() => (dialogOpen = false)}>Ok</Button>

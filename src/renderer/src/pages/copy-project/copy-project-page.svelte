@@ -39,6 +39,7 @@
   let poNo = $state<string>();
   let price = $state<number>();
   let currency = $state<string>('USD');
+  let dueDate = $state<string>();
 
   // MARK: Derived
   // -----------------------------------------------------------------------------
@@ -64,6 +65,7 @@
       customerName: customerName.trim(),
       contractNo: contractNo.trim(),
       poNo: poNo.trim(),
+      dueDate,
       price,
       currency,
     });
@@ -102,6 +104,7 @@
       <TextField label="Customer name" bind:value={customerName} />
       <TextField label="Contract number" bind:value={contractNo} />
       <TextField label="Purchase order number" bind:value={poNo} />
+      <TextField label="Due date" type="date" bind:value={dueDate} />
       <NumberField
         label="Price"
         bind:value={price}

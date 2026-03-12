@@ -279,7 +279,12 @@
   <div class="cards">
     {#if searchRes}
       <div class="card">
-        <h2>Search results</h2>
+        <div class="card-title">
+          <h2>Search results</h2>
+          <IconButton onclick={() => (searchRes = undefined)} tooltip="Close">
+            <Icon>close</Icon>
+          </IconButton>
+        </div>
         <List>
           <ProjectItem
             project={searchRes}
