@@ -1,6 +1,5 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
-  // import z from 'zod';
   import { projectFormSchema } from '../../lib/zod-schema';
 
   // MARK: Types
@@ -59,7 +58,7 @@
   function onsubmit(event: SubmitEvent) {
     event.preventDefault();
 
-    const srcNo = ProjectSt.data.contractNo || '';
+    const srcNo = ProjectSt.contractNo || '';
 
     window.api.projects.postCopy(srcNo, {
       customerName: customerName.trim(),
@@ -76,24 +75,24 @@
   // MARK: Lifecycle
   // -----------------------------------------------------------------------------
   onMount(() => {
-    if (!ProjectSt.data) return;
-    customerName = ProjectSt.data.customerName;
+    if (!ProjectSt._id) return;
+    customerName = ProjectSt.customerName;
   });
 
   onDestroy(() => {
-    ProjectSt.data = undefined;
+    ProjectSt.reset();
   });
 </script>
 
 <svelte:head>
-  <title>Project Manager - Copy project {ProjectSt.data.contractNo}</title>
+  <title>Project Manager - Copy project {ProjectSt.contractNo}</title>
 </svelte:head>
 
 {#snippet slot_headline()}
   <IconButton id="main-menu" tooltip="Back" onclick={() => setPage('projects')}>
     <Icon>arrow_back</Icon>
   </IconButton>
-  <h1>Copy project {ProjectSt.data.contractNo}</h1>
+  <h1>Copy project {ProjectSt.contractNo}</h1>
 {/snippet}
 
 <Page {slot_headline}>

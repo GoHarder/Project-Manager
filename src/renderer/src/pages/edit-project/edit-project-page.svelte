@@ -52,7 +52,7 @@
   // MARK: Effects
   // -----------------------------------------------------------------------------
   $effect(() => {
-    valid = projectFormSchema.safeParse(ProjectSt.data).success;
+    valid = projectFormSchema.safeParse(ProjectSt).success;
   });
 
   // MARK: Contexts
@@ -64,9 +64,8 @@
   function onsubmit(event: SubmitEvent) {
     event.preventDefault();
     setTimeout(() => {
-      const snap = $state.snapshot(ProjectSt.data);
-      snap.user = snap.user.toLowerCase();
-      window.api.projects.put(snap);
+      const data = ProjectSt.getData();
+      window.api.projects.put(data);
       setPage('projects');
     }, 1000);
   }
@@ -76,7 +75,7 @@
 </script>
 
 <svelte:head>
-  <title>Project Manager - Edit project {ProjectSt.data.contractNo}</title>
+  <title>Project Manager - Edit project {ProjectSt.contractNo}</title>
 </svelte:head>
 
 {#snippet dateSpan(label: string, date: string | undefined)}
@@ -100,36 +99,30 @@
       <form {onsubmit}>
         <TextField
           label="Contract number"
-          value={ProjectSt.data.contractNo}
+          value={ProjectSt.contractNo}
           readonly
         />
-        <TextField
-          label="Customer name"
-          bind:value={ProjectSt.data.customerName}
-        />
-        <TextField
-          label="Purchase order number"
-          bind:value={ProjectSt.data.poNo}
-        />
+        <TextField label="Customer name" bind:value={ProjectSt.customerName} />
+        <TextField label="Purchase order number" bind:value={ProjectSt.poNo} />
         <TextField
           label="Due date"
           type="date"
-          bind:value={ProjectSt.data.dueDate}
+          bind:value={ProjectSt.dueDate}
         />
         <NumberField
           label="Price"
-          bind:value={ProjectSt.data.price}
+          bind:value={ProjectSt.price}
           prefix-text="$"
           min="0"
           step="0.01"
         />
-        <TextField label="Work email" bind:value={ProjectSt.data.user} />
-        <Select label="Currency" bind:value={ProjectSt.data.currency}>
+        <TextField label="Work email" bind:value={ProjectSt.user} />
+        <Select label="Currency" bind:value={ProjectSt.currency}>
           <Option value="USD">USD</Option>
           <Option value="CAD">CAD</Option>
         </Select>
         <div class="option">
-          <Checkbox id="bookmarked" bind:checked={ProjectSt.data.bookmarked} />
+          <Checkbox id="bookmarked" bind:checked={ProjectSt.bookmarked} />
           <label for="bookmarked">Bookmarked</label>
         </div>
         <div class="actions">
@@ -143,9 +136,9 @@
 
     <div class="elevated-card data">
       <span>Properties</span><span></span>
-      {@render dateSpan('Created', ProjectSt.data.created)}
-      {@render dateSpan('Completed', ProjectSt.data.completed)}
-      {@render dateSpan('Released', ProjectSt.data.released)}
+      {@render dateSpan('Created', ProjectSt.created)}
+      {@render dateSpan('Completed', ProjectSt.completed)}
+      {@render dateSpan('Released', ProjectSt.released)}
     </div>
   </div>
 </Page>

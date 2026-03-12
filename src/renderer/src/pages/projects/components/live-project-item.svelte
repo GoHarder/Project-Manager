@@ -3,9 +3,8 @@
   // -----------------------------------------------------------------------------
   type Props = {
     project: App.ProjectDoc;
-    'can-complete'?: boolean;
     onEmail?: () => void;
-    onDelete?: () => void;
+    onDelete: () => void;
     setPage: (page: string) => void;
   };
 
@@ -18,18 +17,13 @@
   import { Menu, MenuItem, SubMenu } from '@moss/comp/menu';
 
   import { ProjectSt } from '../../../components/index';
+  import { clipContractNo, clipDrawingTitle, clipEmailSubject } from './lib';
 
   // MARK: Stores
   // -----------------------------------------------------------------------------
   // MARK: Properties
   // -----------------------------------------------------------------------------
-  let {
-    onEmail,
-    onDelete,
-    setPage,
-    'can-complete': canComplete = false,
-    project,
-  }: Props = $props();
+  let { onEmail, onDelete, setPage, project }: Props = $props();
 
   // MARK: Globals
   // -----------------------------------------------------------------------------
@@ -40,7 +34,7 @@
    * @param dateStr The string to format
    */
   function dateString(dateStr: string) {
-    const formatter = new Intl.DateTimeFormat('en-US');
+    const formatter = new Intl.DateTimeFormat('en-US', { timeZone: 'UTC' });
     const date = new Date(dateStr);
     try {
       return formatter.format(date);
@@ -55,8 +49,6 @@
 
   // MARK: Derived
   // -----------------------------------------------------------------------------
-  let iconText = $derived(project.completed ? 'folder_check' : 'folder');
-  let hasDataFile = $derived(project.created !== undefined);
   let canada = $derived(project.currency === 'CAD' ? 'canada' : '');
 
   // MARK: Effects
@@ -67,34 +59,20 @@
   // -----------------------------------------------------------------------------
   // MARK: Events
   // -----------------------------------------------------------------------------
-  function clipContractNo() {
-    navigator.clipboard.writeText(project.contractNo);
-  }
-
-  function clipEmailSubject() {
-    navigator.clipboard.writeText(
-      `${project.customerName} PO ${project.poNo} - HW ${project.contractNo}`,
-    );
-  }
-
-  function clipDrawingTitle() {
-    navigator.clipboard.writeText(
-      `${project.customerName} - ${project.contractNo} QTY: 0`.toUpperCase(),
-    );
-  }
-
   function onComplete() {
-    project.completed = new Date().toISOString();
     const snap = $state.snapshot(project);
+    snap.completed = new Date().toISOString();
     window.api.projects.put(snap);
   }
 
   function onCopy() {
+    // ProjectSt.data = project;
     ProjectSt.setData(project);
     setPage('copy-project');
   }
 
   function onEdit() {
+    // ProjectSt.data = project;
     ProjectSt.setData(project);
     setPage('edit-project');
   }
@@ -112,55 +90,56 @@
 </script>
 
 {#snippet projectMenu()}
-  <MenuItem onclick={onOpen}>
-    <div data-slot="headline">Open folder</div>
-    <Icon data-slot="end">folder_open</Icon>
-  </MenuItem>
-  {#if hasDataFile}
-    <MenuItem onclick={onEmail}>
-      <div data-slot="headline">New email</div>
-      <Icon data-slot="end">email</Icon>
+  <SubMenu>
+    <MenuItem data-slot="item">
+      <div data-slot="headline">Project</div>
+      <Icon data-slot="end">arrow_right</Icon>
     </MenuItem>
-  {/if}
+    <Menu data-slot="menu">
+      <MenuItem onclick={onOpen}>
+        <div data-slot="headline">Open folder</div>
+        <Icon data-slot="end">folder_open</Icon>
+      </MenuItem>
+      <MenuItem disabled>
+        <div data-slot="headline">Pin folder</div>
+        <!-- Unpin folder -->
+        <Icon data-slot="end">keep</Icon>
+        <!-- keep_off -->
+      </MenuItem>
+      <MenuItem onclick={onEmail}>
+        <div data-slot="headline">New email</div>
+        <Icon data-slot="end">email</Icon>
+      </MenuItem>
+    </Menu>
+  </SubMenu>
 {/snippet}
 
 {#snippet editMenu()}
-  {#if hasDataFile}
-    <SubMenu>
-      <MenuItem data-slot="item">
-        <div data-slot="headline">Edit</div>
-        <Icon data-slot="end">arrow_right</Icon>
-      </MenuItem>
-      <Menu data-slot="menu">
-        <MenuItem onclick={onEdit}>
-          <div data-slot="headline">Properties</div>
-          <Icon data-slot="end">bookmark_manager</Icon>
-        </MenuItem>
-        <MenuItem onclick={onCopy}>
-          <div data-slot="headline">Copy</div>
-          <Icon data-slot="end">folder_copy</Icon>
-        </MenuItem>
-        {#if canComplete}
-          <MenuItem onclick={onComplete}>
-            <div data-slot="headline">Complete</div>
-            <Icon data-slot="end">folder_check</Icon>
-          </MenuItem>
-        {/if}
-        {#if onDelete}
-          <Divider role="separator" tabindex="-1" />
-          <MenuItem onclick={onDelete}>
-            <div data-slot="headline">Delete</div>
-            <Icon data-slot="end">folder_delete</Icon>
-          </MenuItem>
-        {/if}
-      </Menu>
-    </SubMenu>
-  {:else}
-    <MenuItem onclick={onCopy}>
-      <div data-slot="headline">Copy</div>
-      <Icon data-slot="end">folder_copy</Icon>
+  <SubMenu>
+    <MenuItem data-slot="item">
+      <div data-slot="headline">Edit</div>
+      <Icon data-slot="end">arrow_right</Icon>
     </MenuItem>
-  {/if}
+    <Menu data-slot="menu">
+      <MenuItem onclick={onEdit}>
+        <div data-slot="headline">Properties</div>
+        <Icon data-slot="end">bookmark_manager</Icon>
+      </MenuItem>
+      <MenuItem onclick={onCopy}>
+        <div data-slot="headline">Copy</div>
+        <Icon data-slot="end">folder_copy</Icon>
+      </MenuItem>
+      <MenuItem onclick={onComplete}>
+        <div data-slot="headline">Complete</div>
+        <Icon data-slot="end">folder_check</Icon>
+      </MenuItem>
+      <Divider role="separator" tabindex="-1" />
+      <MenuItem onclick={onDelete}>
+        <div data-slot="headline">Delete</div>
+        <Icon data-slot="end">folder_delete</Icon>
+      </MenuItem>
+    </Menu>
+  </SubMenu>
 {/snippet}
 
 {#snippet clipboardMenu()}
@@ -170,15 +149,15 @@
       <Icon data-slot="end">arrow_right</Icon>
     </MenuItem>
     <Menu data-slot="menu">
-      <MenuItem onclick={clipDrawingTitle}>
+      <MenuItem onclick={() => clipDrawingTitle(project)}>
         <div data-slot="headline">Drawing title</div>
         <Icon data-slot="end">text_snippet</Icon>
       </MenuItem>
-      <MenuItem onclick={clipEmailSubject}>
+      <MenuItem onclick={() => clipEmailSubject(project)}>
         <div data-slot="headline">Email subject</div>
         <Icon data-slot="end">text_snippet</Icon>
       </MenuItem>
-      <MenuItem onclick={clipContractNo}>
+      <MenuItem onclick={() => clipContractNo(project)}>
         <div data-slot="headline">Contract number</div>
         <Icon data-slot="end">text_snippet</Icon>
       </MenuItem>
@@ -187,14 +166,11 @@
 {/snippet}
 
 <ListItem class={{ 'canada-project': canada }}>
-  <Icon data-slot="start">{iconText}</Icon>
-  <div data-slot="headline">
-    {project.contractNo}
-    {project.customerName || ''}
-  </div>
+  <Icon data-slot="start">folder</Icon>
+  <div data-slot="headline">{project.contractNo} {project.customerName}</div>
 
-  {#if !project.completed && hasDataFile}
-    <div data-slot="supporting-text">Created {dateString(project.created)}</div>
+  {#if project.dueDate}
+    <div data-slot="supporting-text">Due @ {dateString(project.dueDate)}</div>
   {/if}
 
   <span data-slot="end" style="position: relative">
@@ -213,9 +189,7 @@
     >
       {@render projectMenu()}
       {@render editMenu()}
-      {#if hasDataFile}
-        {@render clipboardMenu()}
-      {/if}
+      {@render clipboardMenu()}
     </Menu>
   </span>
 </ListItem>
