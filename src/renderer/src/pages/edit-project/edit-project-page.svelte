@@ -109,18 +109,21 @@
           type="date"
           bind:value={ProjectSt.dueDate}
         />
-        <NumberField
-          label="Price"
-          bind:value={ProjectSt.price}
-          prefix-text="$"
-          min="0"
-          step="0.01"
-        />
+        <div class="price">
+          <NumberField
+            label="Price"
+            bind:value={ProjectSt.price}
+            prefix-text="$"
+            min="0"
+            step="0.01"
+          />
+          <Select label="Currency" bind:value={ProjectSt.currency}>
+            <Option value="USD">USD</Option>
+            <Option value="CAD">CAD</Option>
+          </Select>
+        </div>
         <TextField label="Work email" bind:value={ProjectSt.user} />
-        <Select label="Currency" bind:value={ProjectSt.currency}>
-          <Option value="USD">USD</Option>
-          <Option value="CAD">CAD</Option>
-        </Select>
+
         <div class="option">
           <Checkbox id="bookmarked" bind:checked={ProjectSt.bookmarked} />
           <label for="bookmarked">Bookmarked</label>
@@ -152,6 +155,11 @@
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
+  }
+
+  .price {
+    display: flex;
+    gap: 12px;
   }
 
   form {

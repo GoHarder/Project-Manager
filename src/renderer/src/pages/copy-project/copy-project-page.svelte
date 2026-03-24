@@ -105,17 +105,20 @@
       <TextField label="Contract number" bind:value={contractNo} />
       <TextField label="Purchase order number" bind:value={poNo} />
       <TextField label="Due date" type="date" bind:value={dueDate} />
-      <NumberField
-        label="Price"
-        bind:value={price}
-        prefix-text="$"
-        min="0"
-        step="0.01"
-      />
-      <Select label="Currency" bind:value={currency}>
-        <Option value="USD">USD</Option>
-        <Option value="CAD">CAD</Option>
-      </Select>
+      <div class="price">
+        <NumberField
+          label="Price"
+          bind:value={price}
+          prefix-text="$"
+          min="0"
+          step="0.01"
+        />
+        <Select label="Currency" bind:value={currency}>
+          <Option value="USD">USD</Option>
+          <Option value="CAD">CAD</Option>
+        </Select>
+      </div>
+
       <div class="actions">
         <Button variant="filled" disabled={!valid}>
           <Icon data-slot="icon">create_new_folder</Icon>
@@ -141,5 +144,10 @@
   .actions {
     display: flex;
     justify-content: flex-end;
+  }
+
+  .price {
+    display: flex;
+    gap: 12px;
   }
 </style>
