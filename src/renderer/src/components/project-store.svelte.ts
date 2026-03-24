@@ -13,7 +13,7 @@ class Store {
   pinned = $state(false);
   poNo = $state('');
   price = $state(0);
-  released = $state<string | null>(null);
+  contacted = $state<string | null>(null);
 
   #dueDate = $state<SvelteDate>(new SvelteDate());
   #user = $state('');
@@ -43,10 +43,10 @@ class Store {
     this.currency = data.currency;
     this.customerName = data.customerName;
     this.dueDate = data.dueDate;
-    this.pinned = data.pinned;
+    // this.pinned = data.pinned;
     this.poNo = data.poNo;
     this.price = data.price;
-    this.released = data.released;
+    this.contacted = data.contacted;
     this.user = data.user;
   }
 
@@ -63,7 +63,7 @@ class Store {
       pinned: this.pinned,
       poNo: this.poNo,
       price: this.price,
-      released: this.released,
+      contacted: this.contacted,
       user: this.user,
     };
   }
@@ -80,7 +80,7 @@ class Store {
     this.pinned = false;
     this.poNo = '';
     this.price = 0;
-    this.released = null;
+    this.contacted = null;
     this.user = '';
   }
 }

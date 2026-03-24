@@ -93,7 +93,6 @@ async function postProject(event: IpcMainEvent, project: App.ProjectDoc) {
     bookmarked: false,
     completed: null,
     created: new Date().toISOString(),
-    released: null,
   };
 
   const check = await findProjectPath(dirName);

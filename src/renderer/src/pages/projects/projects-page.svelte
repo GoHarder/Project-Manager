@@ -65,13 +65,32 @@
 
   // MARK: Derived
   // -----------------------------------------------------------------------------
-  let completedProjects = $derived(
-    ProjectListSt.data.filter((project) => project.completed !== null),
-  );
+  let completedProjects = $derived.by(() => {
+    const filtered = ProjectListSt.data.filter(
+      (project) => project.completed !== null,
+    );
 
-  let liveProjects = $derived(
-    ProjectListSt.data.filter((project) => project.completed === null),
-  );
+    return filtered.sort((a, b) => {
+      const aBookmark = a.bookmarked ? 1 : 0;
+      const bBookmark = b.bookmarked ? 1 : 0;
+      return bBookmark - aBookmark;
+    });
+  });
+
+  let liveProjects = $derived.by(() => {
+    const filtered = ProjectListSt.data.filter(
+      (project) => project.completed === null,
+    );
+
+    return filtered.sort((a, b) => {
+      const aDate = new Date(a.created);
+      const bDate = new Date(b.created);
+      const aPinned = a.pinned ? 1 : 0;
+      const bPinned = b.pinned ? 1 : 0;
+      if (aPinned !== bPinned) return bPinned - aPinned;
+      return aDate > bDate ? -1 : aDate < bDate ? 1 : 0;
+    });
+  });
 
   let validSearch = $derived(searchSchema.safeParse(search).success);
 

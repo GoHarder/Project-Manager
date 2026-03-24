@@ -35,14 +35,15 @@ declare global {
       _id: string;
       bookmarked: boolean;
       completed: string | null;
+      contacted: string | null;
       contractNo: string;
       created: string;
       customerName: string;
       dueDate: string;
+      pinned: boolean;
       poNo: string;
       price: number;
       currency: string;
-      released: string | null;
       user: string;
     };
 

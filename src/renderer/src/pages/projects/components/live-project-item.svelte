@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { SvelteDate } from 'svelte/reactivity';
+
   // MARK: Types
   // -----------------------------------------------------------------------------
   type Props = {
@@ -43,6 +45,12 @@
     }
   }
 
+  function timeOffset(start: Date, offset: number) {
+    const result = new SvelteDate(start);
+    result.setDate(start.getDate() + offset);
+    return result;
+  }
+
   // MARK: State
   // -----------------------------------------------------------------------------
   let menuOpen = $state(false);
@@ -50,6 +58,26 @@
   // MARK: Derived
   // -----------------------------------------------------------------------------
   let canada = $derived(project.currency === 'CAD' ? 'canada' : '');
+
+  let now = new SvelteDate();
+  let sevenDays = $derived.by(() => {
+    const created = new SvelteDate(project.created);
+    return timeOffset(created, 7);
+  });
+  let dueDate = $derived(new SvelteDate(project.dueDate));
+
+  let reminderInterval = $derived.by(() => {
+    if (dueDate < now) return 30;
+    if (sevenDays < now) return 7;
+    return 0;
+  });
+
+  let reminder = $derived.by(() => {
+    if (reminderInterval === 0) return false;
+    const contacted = new SvelteDate(project.contacted);
+    const nextContact = timeOffset(contacted, reminderInterval);
+    return now > nextContact;
+  });
 
   // MARK: Effects
   // -----------------------------------------------------------------------------
@@ -65,14 +93,24 @@
     window.api.projects.put(snap);
   }
 
+  function onContact() {
+    const snap = $state.snapshot(project);
+    snap.contacted = new Date().toISOString();
+    window.api.projects.put(snap);
+  }
+
+  function onPin() {
+    const snap = $state.snapshot(project);
+    snap.pinned = !snap.pinned;
+    window.api.projects.put(snap);
+  }
+
   function onCopy() {
-    // ProjectSt.data = project;
     ProjectSt.setData(project);
     setPage('copy-project');
   }
 
   function onEdit() {
-    // ProjectSt.data = project;
     ProjectSt.setData(project);
     setPage('edit-project');
   }
@@ -100,11 +138,13 @@
         <div data-slot="headline">Open folder</div>
         <Icon data-slot="end">folder_open</Icon>
       </MenuItem>
-      <MenuItem disabled>
-        <div data-slot="headline">Pin folder</div>
-        <!-- Unpin folder -->
-        <Icon data-slot="end">keep</Icon>
-        <!-- keep_off -->
+      <MenuItem onclick={onPin}>
+        <div data-slot="headline">
+          {project.pinned ? 'Unpin folder' : 'Pin folder'}
+        </div>
+        <Icon data-slot="end">
+          {project.pinned ? 'keep_off' : 'keep'}
+        </Icon>
       </MenuItem>
       <MenuItem onclick={onEmail}>
         <div data-slot="headline">New email</div>
@@ -165,8 +205,16 @@
   </SubMenu>
 {/snippet}
 
-<ListItem class={{ 'canada-project': canada }}>
-  <Icon data-slot="start">folder</Icon>
+<ListItem class={{ 'canada-project': canada, pinned: project.pinned }}>
+  <div class="pre" data-slot="start">
+    {#if reminder}
+      <IconButton tooltip="Send complete" onclick={onContact}>
+        <Icon>schedule_send</Icon>
+      </IconButton>
+    {:else}
+      <Icon>folder</Icon>
+    {/if}
+  </div>
   <div data-slot="headline">{project.contractNo} {project.customerName}</div>
 
   {#if project.dueDate}
@@ -193,3 +241,22 @@
     </Menu>
   </span>
 </ListItem>
+
+<style lang="scss">
+  .pre {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 48px;
+    width: 48px;
+  }
+
+  :global(.pinned) {
+    // --md-list-container-color: #f4fbfa;
+    background-color: var(--md-sys-color-secondary-container);
+    --md-list-item-label-text-color: var(--md-sys-color-on-secondary-container);
+    --md-list-item-supporting-text-color: var(
+      --md-sys-color-on-secondary-container
+    );
+  }
+</style>

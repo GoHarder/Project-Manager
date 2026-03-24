@@ -137,8 +137,8 @@
     <div class="elevated-card data">
       <span>Properties</span><span></span>
       {@render dateSpan('Created', ProjectSt.created)}
+      {@render dateSpan('Contacted', ProjectSt.contacted)}
       {@render dateSpan('Completed', ProjectSt.completed)}
-      {@render dateSpan('Released', ProjectSt.released)}
     </div>
   </div>
 </Page>

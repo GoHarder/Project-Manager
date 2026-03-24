@@ -118,7 +118,7 @@
   </SubMenu>
 {/snippet}
 
-<ListItem class={{ 'canada-project': canada }}>
+<ListItem class={{ 'canada-project': canada, bookmarked: project.bookmarked }}>
   <Icon data-slot="start">folder_check</Icon>
   <div data-slot="headline">{project.contractNo} {project.customerName}</div>
 
@@ -142,3 +142,14 @@
     </Menu>
   </span>
 </ListItem>
+
+<style lang="scss">
+  :global(.bookmarked) {
+    // --md-list-container-color: #f4fbfa;
+    background-color: var(--md-sys-color-secondary-container);
+    --md-list-item-label-text-color: var(--md-sys-color-on-secondary-container);
+    --md-list-item-supporting-text-color: var(
+      --md-sys-color-on-secondary-container
+    );
+  }
+</style>
